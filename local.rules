@@ -1,0 +1,52 @@
+# Copyright 2001-2013 Sourcefire, Inc. All Rights Reserved.
+#
+# This file contains (i) proprietary rules that were created, tested and certified by
+# Sourcefire, Inc. (the "VRT Certified Rules") that are distributed under the VRT
+# Certified Rules License Agreement (v 2.0), and (ii) rules that were created by
+# Sourcefire and other third parties (the "GPL Rules") that are distributed under the
+# GNU General Public License (GPL), v2.
+# 
+# The VRT Certified Rules are owned by Sourcefire, Inc. The GPL Rules were created
+# by Sourcefire and other third parties. The GPL Rules created by Sourcefire are
+# owned by Sourcefire, Inc., and the GPL Rules not created by Sourcefire are owned by
+# their respective creators. Please see http://www.snort.org/snort/snort-team/ for a
+# list of third party owners and their respective copyrights.
+# 
+# In order to determine what rules are VRT Certified Rules or GPL Rules, please refer
+# to the VRT Certified Rules License Agreement (v2.0).
+#
+#-------------
+# LOCAL RULES
+#-------------
+
+#####Testing####
+#alert tcp any any -> $HOME_NET any (msg:"logged";sid:1000001;)
+#alert udp any any -> $HOME_NET any (msg:"alert";sid:1000002;)
+#alert icmp any any -> $HOME_NET any (msg:"alert";sid:1000003;)
+
+####BEEF####
+alert tcp any any -> $HOME_NET any (msg:"Beef attack1";sid:1000004;flow:to_client,established;file_data;content:"window.ActiveXObject";)
+alert tcp any any -> $HOME_NET any (msg:"Beef attack2";sid:1000005;flow:to_client,established;file_data;content:"navigator.plugins";content:"name.indexOf(\"VLC\")";)
+alert tcp any any -> $HOME_NET any (msg:"Beef attack3";sid:1000005;flow:to_client,established;file_data;content:"setRequestHeader(\"Content-type\", \"application/x-www-form-urlencoded"; rev:1;)
+
+
+####SQL Injection####
+alert tcp any any -> $HOME_NET 8080 (msg: "SQL Injection Attempt - and 1=1"; content:"and"; pcre: "/[0-9]{1,10}=[0-9]{1,10}/iU"; classtype:web-application-attack; sid:1000006; rev:1;)
+alert tcp any any -> $HOME_NET 8080 (msg: "SQL Injection Attempt - and 1=1"; content:"or"; pcre: "/[0-9]{1,10}=[0-9]{1,10}/iU"; classtype:web-application-attack; sid:1000007; rev:1;)
+alert tcp any any -> $HOME_NET 8080 (msg: "SQL Injection Attempt - and 1=1"; content: "and"; pcre: "/[a-z]=[a-z]/iU"; classtype:web-application-attack; sid:1000012; rev:1;)
+alert tcp any any -> $HOME_NET 8080 (msg: "SQL Injection Attempt - and 1=1"; content: "or"; pcre: "/[a-z]=[a-z]/iU"; classtype:web-application-attack; sid:1000013; rev:1;)
+
+alert tcp any any -> $HOME_NET 8080 (msg: "SQL Injection Attempt - and 1=1"; content: "GET"; http_method; uricontent: "select"; nocase; classtype:web-application-attack; sid:1000008; rev:1;)
+alert tcp any any -> $HOME_NET 8080 (msg: "SQL Injection Attempt - and 1=1"; content: "GET"; http_method; uricontent: "insert"; nocase; classtype:web-application-attack; sid:1000009; rev:1;)
+alert tcp any any -> $HOME_NET 8080 (msg: "SQL Injection Attempt - and 1=1"; content: "GET"; http_method; uricontent: "delete"; nocase; classtype:web-application-attack; sid:10000010; rev:1;)
+alert tcp any any -> $HOME_NET 8080 (msg: "SQL Injection Attempt - and 1=1"; content: "GET"; http_method; uricontent: "update"; nocase; classtype:web-application-attack; sid:10000011; rev:1;)
+
+####Metasploit####
+alert tcp $HOME_NET any -> any any (msg:"Metasplot attack"; flow:to_server,established; content:"|4d 69 63 72 6f 73 6f 66 74 20 57 69 6e 64 6f 77 73 20 5b 56 65 72 73 69 6f 6e 20 31 30 2e 30 2e 31 30 35 38 36 5d|";  sid:1618007; rev:1;)
+#reject tcp $HOME_NET any -> any any (msg:"Metasplot rejection"; flow:to_server,established; content:"|4d 69 63 72 6f 73 6f 66 74 20 57 69 6e 64 6f 77 73 20 5b 56 65 72 73 69 6f 6e 20 31 30 2e 30 2e 31 30 35 38 36 5d|";  sid:1618008; rev:1;)
+
+####Password Cracking####
+alert tcp any any -> $HOME_NET 8080 (msg:"password cracking"; flow:to_server, established; classtype:web-application-activity; content: "password"; threshold:type threshold, track by_src, count 3 , seconds 60 ; sid:1618010; rev:1;)
+
+####Nikto Attacks####
+alert tcp any any -> $HOME_NET 8080 (msg:"nikto attacks"; flow:to_server, established; classtype:web-application-activity; content: "GET"; threshold:type threshold, track by_src, count 500 , seconds 60 ; sid:1618011; rev:1;)

@@ -1,0 +1,12 @@
+<web-app>
+	<servlet>
+		<servlet-name>Passwordver</servlet-name>
+		<servlet-class>Passwordver</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Passwordver</servlet-name>
+		<url-pattern>passwordver</url-pattern>
+	</servlet-mapping>
+</web-app>
+
+		
